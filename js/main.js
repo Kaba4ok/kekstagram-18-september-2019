@@ -9,6 +9,15 @@ var COMMENTS_MESSAGE = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
+var PHOTO_DESCRIPTION = [
+  'Тестим новую камеру!',
+  'Просто фото...',
+  'Улыбаемся и машем!',
+  'Во время прогулки...',
+  'Получилось случайно, но зато как!',
+  'Где-то на окраине города'
+];
+
 var COMMENT_AUTOR_NAME = [
   'Петя',
   'Саша',
@@ -63,7 +72,7 @@ var generatePhotoObject = function (photoNumber) {
   var photoObject = {};
 
   photoObject.url = 'photos/' + photoNumber + '.jpg';
-  photoObject.description = 'Что то там про фотку и все такое...';
+  photoObject.description = PHOTO_DESCRIPTION[generateRandomNumber(0, PHOTO_DESCRIPTION.length - 1)];
   photoObject.likes = generateRandomNumber(MIN_LIKES_COUNT, MAX_LIKES_COUNT);
   photoObject.comments = generateCommentsObjectsArray();
 
@@ -109,6 +118,7 @@ renderPhotosList(generatePhotosObjectsArray(PHOTOS_COUNT));
 
 var bigPhoto = document.querySelector('.big-picture');
 var commentsContainer = bigPhoto.querySelector('.social__comments');
+var commentsDefault = commentsContainer.querySelectorAll('.social__comment');
 
 // генерирует шаблон комментария
 var generateCommentTemplate = function (container) {
@@ -128,6 +138,10 @@ var renderBigPhoto = function (photos) {
   bigPhoto.querySelector('.likes-count').textContent = photos[0].likes;
   bigPhoto.querySelector('.comments-count').textContent = photos[0].comments.length;
   bigPhoto.querySelector('.social__caption').textContent = photos[0].description;
+
+  commentsDefault.forEach(function (comment) {
+    comment.style.display = 'none';
+  });
 
   for (var i = 0; i < photos[0].comments.length; i++) {
     generateCommentTemplate(commentsContainer);
