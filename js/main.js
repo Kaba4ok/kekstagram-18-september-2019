@@ -140,7 +140,7 @@ var renderBigPhoto = function (photos) {
   bigPhoto.querySelector('.social__caption').textContent = photos[0].description;
 
   commentsDefault.forEach(function (comment) {
-    comment.style.display = 'none';
+    commentsContainer.removeChild(comment);
   });
 
   for (var i = 0; i < photos[0].comments.length; i++) {
