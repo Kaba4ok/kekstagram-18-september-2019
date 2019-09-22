@@ -9,6 +9,15 @@ var COMMENTS_MESSAGE = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
+var PHOTO_DESCRIPTION = [
+  'Тестим новую камеру!',
+  'Просто фото...',
+  'Улыбаемся и машем!',
+  'Во время прогулки...',
+  'Получилось случайно, но зато как!',
+  'Где-то на окраине города'
+];
+
 var COMMENT_AUTOR_NAME = [
   'Петя',
   'Саша',
@@ -39,9 +48,9 @@ var generateRandomNumber = function (min, max) {
 var generateCommentObject = function () {
   var commentObject = {};
 
-  commentObject.avatar = 'avatar-' + generateRandomNumber(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
-  commentObject.message = COMMENTS_MESSAGE[generateRandomNumber(0, COMMENTS_MESSAGE.length)];
-  commentObject.name = COMMENT_AUTOR_NAME[generateRandomNumber(0, COMMENT_AUTOR_NAME.length)];
+  commentObject.avatar = 'img/avatar-' + generateRandomNumber(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
+  commentObject.message = COMMENTS_MESSAGE[generateRandomNumber(0, COMMENTS_MESSAGE.length - 1)];
+  commentObject.name = COMMENT_AUTOR_NAME[generateRandomNumber(0, COMMENT_AUTOR_NAME.length - 1)];
 
   return commentObject;
 };
@@ -63,7 +72,7 @@ var generatePhotoObject = function (photoNumber) {
   var photoObject = {};
 
   photoObject.url = 'photos/' + photoNumber + '.jpg';
-  photoObject.description = 'Что то там про фотку и все такое...';
+  photoObject.description = PHOTO_DESCRIPTION[generateRandomNumber(0, PHOTO_DESCRIPTION.length - 1)];
   photoObject.likes = generateRandomNumber(MIN_LIKES_COUNT, MAX_LIKES_COUNT);
   photoObject.comments = generateCommentsObjectsArray();
 
@@ -104,3 +113,46 @@ var renderPhotosList = function (photos) {
 };
 
 renderPhotosList(generatePhotosObjectsArray(PHOTOS_COUNT));
+
+// ------------------------ОТРИСОВКА БОЛЬШОЙ КАРТИНКИ--------------------------------
+
+var bigPhoto = document.querySelector('.big-picture');
+var commentsContainer = bigPhoto.querySelector('.social__comments');
+var commentsDefault = commentsContainer.querySelectorAll('.social__comment');
+
+// генерирует шаблон комментария
+var generateCommentTemplate = function (container) {
+  container.insertAdjacentHTML('afterbegin',
+      '<li class="social__comment">' +
+        '<img class="social__picture" width="35" height="35">' +
+        '<p class="social__text"></p>' +
+      '</li>'
+  );
+};
+
+// отрисовывает блок с большой фотографией
+var renderBigPhoto = function (photos) {
+  bigPhoto.classList.remove('hidden');
+
+  bigPhoto.querySelector('.big-picture__img').querySelector('img').src = photos[0].url;
+  bigPhoto.querySelector('.likes-count').textContent = photos[0].likes;
+  bigPhoto.querySelector('.comments-count').textContent = photos[0].comments.length;
+  bigPhoto.querySelector('.social__caption').textContent = photos[0].description;
+
+  commentsDefault.forEach(function (comment) {
+    commentsContainer.removeChild(comment);
+  });
+
+  for (var i = 0; i < photos[0].comments.length; i++) {
+    generateCommentTemplate(commentsContainer);
+
+    commentsContainer.querySelector('.social__comment').querySelector('img').src = photos[0].comments[i].avatar;
+    commentsContainer.querySelector('.social__comment').querySelector('img').alt = photos[0].comments[i].name;
+    commentsContainer.querySelector('.social__text').textContent = photos[0].comments[i].message;
+  }
+};
+
+bigPhoto.querySelector('.social__comment-count').classList.add('visually-hidden');
+bigPhoto.querySelector('.comments-loader').classList.add('visually-hidden');
+
+renderBigPhoto(generatePhotosObjectsArray(PHOTOS_COUNT));
