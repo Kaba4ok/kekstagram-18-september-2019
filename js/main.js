@@ -34,8 +34,35 @@ var MIN_LIKES_COUNT = 15;
 var MAX_LIKES_COUNT = 200;
 var PHOTOS_COUNT = 25;
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
+var SCALE_STEP = 25;
+var MAX_EFFECT_VALUE = 100;
+
+var CHROME_COEFFICIENT = 0.01;
+var SEPIA_COEFFICIENT = 0.01;
+var PHOBOS_COEFFICIENT = 0.03;
+var HEAT_COEFFICIENT = 0.02;
+
 var photoTemplate = document.querySelector('#picture').content.querySelector('.picture');
 var photosList = document.querySelector('.pictures');
+
+var uploadField = document.querySelector('.img-upload');
+var imgUploadInput = uploadField.querySelector('.img-upload__input');
+var buttonCloseUploadField = uploadField.querySelector('.img-upload__cancel');
+var userUploadImg = uploadField.querySelector('.img-upload__preview img');
+
+var scaleValueInput = uploadField.querySelector('.scale__control--value');
+var buttonDecreaseImgScale = uploadField.querySelector('.scale__control--smaller');
+var buttonIncreaseImgScale = uploadField.querySelector('.scale__control--bigger');
+
+var pin = uploadField.querySelector('.effect-level__pin');
+var effectScale = uploadField.querySelector('.effect-level__line');
+var effectValueInput = uploadField.querySelector('.effect-level__value');
+var effects = uploadField.querySelector('.effects');
+
+//----------------------------------------------------------------------------------------------------------
 
 // генерирует случайное число
 var generateRandomNumber = function (min, max) {
@@ -155,4 +182,124 @@ var renderBigPhoto = function (photos) {
 bigPhoto.querySelector('.social__comment-count').classList.add('visually-hidden');
 bigPhoto.querySelector('.comments-loader').classList.add('visually-hidden');
 
-renderBigPhoto(generatePhotosObjectsArray(PHOTOS_COUNT));
+// renderBigPhoto(generatePhotosObjectsArray(PHOTOS_COUNT));
+
+// сбрасывает все настройки изображения
+var resetUserImgSettings = function () {
+  userUploadImg.removeAttribute('class');
+  userUploadImg.removeAttribute('style');
+  userUploadImg.style.transform = 'scale(' + MAX_EFFECT_VALUE / 100 + ')';
+  scaleValueInput.value = MAX_EFFECT_VALUE + '%';
+  effectValueInput.value = MAX_EFFECT_VALUE;
+  imgUploadInput.value = '';
+};
+
+//-----------------------------------ОБРАБОТЧИКИ----------------------------------------
+
+// обработчик события нажатия на клавишу ESC
+var onModalEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeUploadField();
+  }
+};
+
+// обработчик события клика на кнопку уменьшения изображения
+var onButtonDecreaseImgScale = function () {
+  var valueInput = Number(scaleValueInput.value.slice(0, scaleValueInput.value.length - 1));
+
+  if (valueInput > SCALE_STEP) {
+    valueInput -= SCALE_STEP;
+  }
+
+  scaleValueInput.value = valueInput + '%';
+  userUploadImg.style.transform = 'scale(' + valueInput / 100 + ')';
+};
+
+// обработчик события клика на кнопку увеличения изображения
+var onButtonIncreaseImgScale = function () {
+  var valueInput = Number(scaleValueInput.value.slice(0, scaleValueInput.value.length - 1));
+
+  if (valueInput < MAX_EFFECT_VALUE) {
+    valueInput += SCALE_STEP;
+  }
+
+  scaleValueInput.value = valueInput + '%';
+  userUploadImg.style.transform = 'scale(' + valueInput / 100 + ')';
+};
+
+// вычисление уровня насыщенности эффекта
+var onPinMouseUp = function () {
+  var effectValue = Math.round((pin.offsetLeft * 100) / effectScale.offsetWidth);
+
+  effectValueInput.value = effectValue;
+};
+
+// смена эффекта по клику
+var onEffectsItemClick = function (effectItem) {
+
+  resetUserImgSettings();
+
+  var effectName = effectItem.value;
+
+  switch (effectName) {
+    case 'chrome':
+      userUploadImg.classList.add('effects__preview--chrome');
+      userUploadImg.style.filter = 'grayscale(' + (effectValueInput.value * CHROME_COEFFICIENT) + ')';
+      break;
+    case 'sepia':
+      userUploadImg.classList.add('effects__preview--sepia');
+      userUploadImg.style.filter = 'sepia(' + (effectValueInput.value * SEPIA_COEFFICIENT) + ')';
+      break;
+    case 'marvin':
+      userUploadImg.classList.add('effects__preview--marvin');
+      userUploadImg.style.filter = 'invert(' + effectValueInput.value + ')';
+      break;
+    case 'phobos':
+      userUploadImg.classList.add('effects__preview--phobos');
+      userUploadImg.style.filter = 'blur(' + (effectValueInput.value * PHOBOS_COEFFICIENT) + 'px)';
+      break;
+    case 'heat':
+      userUploadImg.classList.add('effects__preview--heat');
+      userUploadImg.style.filter = 'brightness(' + (effectValueInput.value * HEAT_COEFFICIENT + 1) + ')';
+      break;
+  }
+};
+
+// открывает окно редактирования
+var openUploadField = function () {
+  uploadField.querySelector('.img-upload__overlay').classList.remove('hidden');
+
+  document.addEventListener('keydown', onModalEscPress);
+
+  resetUserImgSettings();
+};
+
+// закрывает окно редактирования
+var closeUploadField = function () {
+  uploadField.querySelector('.img-upload__overlay').classList.add('hidden');
+  document.removeEventListener('keydown', onModalEscPress);
+
+  resetUserImgSettings();
+};
+
+//----------------------------------СОБЫТИЯ------------------------------------------
+
+// открытие окна редактирования фото при изменении значения инпута загрузки
+imgUploadInput.addEventListener('change', openUploadField);
+
+// закрытие окна редактирования фото при клике на кнопку закрытия
+buttonCloseUploadField.addEventListener('click', closeUploadField);
+
+// уменьшение изображения при клике на кнопку "-"
+buttonDecreaseImgScale.addEventListener('click', onButtonDecreaseImgScale);
+
+// увеличение изображения при клике на кнопку "+"
+buttonIncreaseImgScale.addEventListener('click', onButtonIncreaseImgScale);
+
+// изменение уровня насыщенности эффекта при отжатии ЛКМ
+pin.addEventListener('mouseup', onPinMouseUp);
+
+// изменение эффекта фото при клике
+effects.addEventListener('click', function (evt) {
+  onEffectsItemClick(evt.target);
+});
