@@ -35,7 +35,7 @@ var MAX_LIKES_COUNT = 200;
 var PHOTOS_COUNT = 25;
 
 var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+// var ENTER_KEYCODE = 13;
 
 var SCALE_STEP = 25;
 var MAX_EFFECT_VALUE = 100;
@@ -62,7 +62,7 @@ var effectScale = uploadField.querySelector('.effect-level__line');
 var effectValueInput = uploadField.querySelector('.effect-level__value');
 var effects = uploadField.querySelector('.effects');
 
-//----------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
 
 // генерирует случайное число
 var generateRandomNumber = function (min, max) {
@@ -143,7 +143,7 @@ renderPhotosList(generatePhotosObjectsArray(PHOTOS_COUNT));
 
 // ------------------------ОТРИСОВКА БОЛЬШОЙ КАРТИНКИ--------------------------------
 
-var bigPhoto = document.querySelector('.big-picture');
+/* var bigPhoto = document.querySelector('.big-picture');
 var commentsContainer = bigPhoto.querySelector('.social__comments');
 var commentsDefault = commentsContainer.querySelectorAll('.social__comment');
 
@@ -180,7 +180,7 @@ var renderBigPhoto = function (photos) {
 };
 
 bigPhoto.querySelector('.social__comment-count').classList.add('visually-hidden');
-bigPhoto.querySelector('.comments-loader').classList.add('visually-hidden');
+bigPhoto.querySelector('.comments-loader').classList.add('visually-hidden');*/
 
 // renderBigPhoto(generatePhotosObjectsArray(PHOTOS_COUNT));
 
@@ -194,7 +194,7 @@ var resetUserImgSettings = function () {
   imgUploadInput.value = '';
 };
 
-//-----------------------------------ОБРАБОТЧИКИ----------------------------------------
+// -----------------------------------ОБРАБОТЧИКИ----------------------------------------
 
 // обработчик события нажатия на клавишу ESC
 var onModalEscPress = function (evt) {
@@ -282,7 +282,7 @@ var closeUploadField = function () {
   resetUserImgSettings();
 };
 
-//----------------------------------СОБЫТИЯ------------------------------------------
+// ----------------------------------СОБЫТИЯ------------------------------------------
 
 // открытие окна редактирования фото при изменении значения инпута загрузки
 imgUploadInput.addEventListener('change', openUploadField);
