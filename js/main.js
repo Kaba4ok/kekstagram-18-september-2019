@@ -88,18 +88,17 @@ var resetUserImgSettings = function () {
   effectValueInput.value = MAX_EFFECT_VALUE;
 };
 
-// определяет отсутствие пробела перед '#'
-var detectSpaceMissingBeforeHex = function (hashTag) {
-  var flag = false;
+// удалаяет пробелы между хэш-тегами
+var deleteSpacesInHashtags = function (arr) {
 
-  for (var i = 1; i < hashTag.length; i++) {
-    if (hashTag[i] === '#') {
-      flag = true;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] === '') {
+      arr.splice(i, 1);
+      i--;
     }
   }
-
-  return flag;
 };
+
 
 // определяет наличие повторяющихся хэш-тегов вне зависимости от регистра
 var detectDoubleHashtag = function (hashtagsArray) {
@@ -120,6 +119,8 @@ var detectDoubleHashtag = function (hashtagsArray) {
 var validateHashtags = function (evt) {
   var hashtagsArray = evt.target.value.split(' ');
 
+  deleteSpacesInHashtags(hashtagsArray);
+
   var errorMessage = evt.target.setCustomValidity('');
 
   for (var i = 0; i < hashtagsArray.length; i++) {
@@ -127,8 +128,6 @@ var validateHashtags = function (evt) {
       errorMessage = evt.target.setCustomValidity('Хэш-тег должен начинаться с символа "#"');
     } else if (hashtagsArray[i] === '#') {
       errorMessage = evt.target.setCustomValidity('Хеш-тег не может состоять только из символа "#"');
-    } else if (detectSpaceMissingBeforeHex(hashtagsArray[i])) {
-      errorMessage = evt.target.setCustomValidity('Хеш-теги должны разделяться пробелом перед символом "#"');
     } else if (detectDoubleHashtag(hashtagsArray)) {
       errorMessage = evt.target.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
     } else if (hashtagsArray.length > 5) {
