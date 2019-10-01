@@ -44,6 +44,9 @@ var SEPIA_COEFFICIENT = 0.01;
 var PHOBOS_COEFFICIENT = 0.03;
 var HEAT_COEFFICIENT = 0.02;
 
+var HASHTAGS_MAX_COUNT = 5;
+var HASHTAG_MAX_LENGTH = 20;
+
 var photoSample = document.querySelector('#picture').content.querySelector('.picture');
 var photosList = document.querySelector('.pictures');
 
@@ -88,56 +91,44 @@ var resetUserImgSettings = function () {
   effectValueInput.value = MAX_EFFECT_VALUE;
 };
 
-// удалаяет пробелы между хэш-тегами
-var removeSpacesInHashtags = function (hashtags) {
-
-  for (var i = 0; i < hashtags.length; i++) {
-    if (hashtags[i] === '') {
-      hashtags.splice(i, 1);
-      i--;
-    }
-  }
-};
-
-
 // определяет наличие повторяющихся хэш-тегов вне зависимости от регистра
-var detectDuplicateHashtag = function (hashtags) {
-  var flag = false;
+var detectDuplicateHashtag = function (tag, index, hashes) {
+  var tags = hashes.slice(0);
 
-  for (var i = 0; i < hashtags.length; i++) {
-    for (var j = i + 1; j < hashtags.length; j++) {
-      if (hashtags[i].toLowerCase() === hashtags[j].toLowerCase()) {
-        flag = true;
-      }
-    }
-  }
+  tags.splice(index, 1);
 
-  return flag;
+  return tags
+    .map(function (hashtag) {
+      return hashtag.toLowerCase();
+    })
+    .includes(tag.toLowerCase());
 };
 
 // проверяет на валидность введенные хэш-теги
 var validateHashtags = function (evt) {
-  var hashtags = evt.target.value.split(' ');
+  var hashes = evt.target.value
+    .split(' ')
+    .filter(function (tag) {
+      return tag;
+    });
 
-  removeSpacesInHashtags(hashtags);
+  var errorMessage = '';
 
-  var errorMessage = evt.target.setCustomValidity('');
-
-  for (var i = 0; i < hashtags.length; i++) {
-    if (hashtags[i][0] !== '#') {
-      errorMessage = evt.target.setCustomValidity('Хэш-тег должен начинаться с символа "#"');
-    } else if (hashtags[i] === '#') {
-      errorMessage = evt.target.setCustomValidity('Хеш-тег не может состоять только из символа "#"');
-    } else if (detectDuplicateHashtag(hashtags)) {
-      errorMessage = evt.target.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
-    } else if (hashtags.length > 5) {
-      errorMessage = evt.target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
-    } else if (hashtags[i].length > 20) {
-      errorMessage = evt.target.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ "#"');
-    } else {
-      errorMessage = errorMessage;
+  hashes.forEach(function (tag, index) {
+    if (tag[0] !== '#') {
+      errorMessage = 'Хэш-тег должен начинаться с символа "#"';
+    } else if (tag === '#') {
+      errorMessage = 'Хеш-тег не может состоять только из символа "#"';
+    } else if (detectDuplicateHashtag(tag, index, hashes)) {
+      errorMessage = 'Один и тот же хэш-тег не может быть использован дважды';
+    } else if (hashes.length > HASHTAGS_MAX_COUNT) {
+      errorMessage = 'Нельзя указать больше пяти хэш-тегов';
+    } else if (tag.length > HASHTAG_MAX_LENGTH) {
+      errorMessage = 'Максимальная длина одного хэш-тега 20 символов, включая символ "#"';
     }
-  }
+  });
+
+  evt.target.setCustomValidity(errorMessage);
 };
 
 // меняет эффект на фото при нажатии на кнопку эффекта
