@@ -1,6 +1,6 @@
 'use strict';
 
-var COMMENTS_MESSAGE = [
+var COMMENTS_MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -9,7 +9,7 @@ var COMMENTS_MESSAGE = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-var PHOTO_DESCRIPTION = [
+var PHOTO_DESCRIPTIONS = [
   'Тестим новую камеру!',
   'Просто фото...',
   'Улыбаемся и машем!',
@@ -18,7 +18,7 @@ var PHOTO_DESCRIPTION = [
   'Где-то на окраине города'
 ];
 
-var COMMENT_AUTOR_NAME = [
+var COMMENT_AUTORS_NAMES = [
   'Петя',
   'Саша',
   'Маша',
@@ -44,12 +44,12 @@ var SEPIA_COEFFICIENT = 0.01;
 var PHOBOS_COEFFICIENT = 0.03;
 var HEAT_COEFFICIENT = 0.02;
 
-var photoTemplate = document.querySelector('#picture').content.querySelector('.picture');
+var photoSample = document.querySelector('#picture').content.querySelector('.picture');
 var photosList = document.querySelector('.pictures');
 
 var bigPhoto = document.querySelector('.big-picture');
 var commentsContainer = bigPhoto.querySelector('.social__comments');
-var commentsDefault = commentsContainer.querySelectorAll('.social__comment');
+var commentsPlugs = commentsContainer.querySelectorAll('.social__comment');
 var buttonCloseBigPhoto = bigPhoto.querySelector('.big-picture__cancel');
 
 var uploadField = document.querySelector('.img-upload');
@@ -57,7 +57,7 @@ var imgUploadInput = uploadField.querySelector('.img-upload__input');
 var buttonCloseUploadField = uploadField.querySelector('.img-upload__cancel');
 var userUploadImg = uploadField.querySelector('.img-upload__preview img');
 
-var scaleValueInput = uploadField.querySelector('.scale__control--value');
+var scaleIndicator = uploadField.querySelector('.scale__control--value');
 var buttonDecreaseImgScale = uploadField.querySelector('.scale__control--smaller');
 var buttonIncreaseImgScale = uploadField.querySelector('.scale__control--bigger');
 
@@ -84,16 +84,16 @@ var resetUserImgSettings = function () {
   userUploadImg.removeAttribute('class');
   userUploadImg.removeAttribute('style');
   userUploadImg.style.transform = 'scale(' + MAX_EFFECT_VALUE / 100 + ')';
-  scaleValueInput.value = MAX_EFFECT_VALUE + '%';
+  scaleIndicator.value = MAX_EFFECT_VALUE + '%';
   effectValueInput.value = MAX_EFFECT_VALUE;
 };
 
 // удалаяет пробелы между хэш-тегами
-var deleteSpacesInHashtags = function (arr) {
+var removeSpacesInHashtags = function (hashtags) {
 
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === '') {
-      arr.splice(i, 1);
+  for (var i = 0; i < hashtags.length; i++) {
+    if (hashtags[i] === '') {
+      hashtags.splice(i, 1);
       i--;
     }
   }
@@ -101,12 +101,12 @@ var deleteSpacesInHashtags = function (arr) {
 
 
 // определяет наличие повторяющихся хэш-тегов вне зависимости от регистра
-var detectDoubleHashtag = function (hashtagsArray) {
+var detectDuplicateHashtag = function (hashtags) {
   var flag = false;
 
-  for (var i = 0; i < hashtagsArray.length; i++) {
-    for (var j = i + 1; j < hashtagsArray.length; j++) {
-      if (hashtagsArray[i].toLowerCase() === hashtagsArray[j].toLowerCase()) {
+  for (var i = 0; i < hashtags.length; i++) {
+    for (var j = i + 1; j < hashtags.length; j++) {
+      if (hashtags[i].toLowerCase() === hashtags[j].toLowerCase()) {
         flag = true;
       }
     }
@@ -117,22 +117,22 @@ var detectDoubleHashtag = function (hashtagsArray) {
 
 // проверяет на валидность введенные хэш-теги
 var validateHashtags = function (evt) {
-  var hashtagsArray = evt.target.value.split(' ');
+  var hashtags = evt.target.value.split(' ');
 
-  deleteSpacesInHashtags(hashtagsArray);
+  removeSpacesInHashtags(hashtags);
 
   var errorMessage = evt.target.setCustomValidity('');
 
-  for (var i = 0; i < hashtagsArray.length; i++) {
-    if (hashtagsArray[i][0] !== '#') {
+  for (var i = 0; i < hashtags.length; i++) {
+    if (hashtags[i][0] !== '#') {
       errorMessage = evt.target.setCustomValidity('Хэш-тег должен начинаться с символа "#"');
-    } else if (hashtagsArray[i] === '#') {
+    } else if (hashtags[i] === '#') {
       errorMessage = evt.target.setCustomValidity('Хеш-тег не может состоять только из символа "#"');
-    } else if (detectDoubleHashtag(hashtagsArray)) {
+    } else if (detectDuplicateHashtag(hashtags)) {
       errorMessage = evt.target.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
-    } else if (hashtagsArray.length > 5) {
+    } else if (hashtags.length > 5) {
       errorMessage = evt.target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
-    } else if (hashtagsArray[i].length > 20) {
+    } else if (hashtags[i].length > 20) {
       errorMessage = evt.target.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ "#"');
     } else {
       errorMessage = errorMessage;
@@ -192,79 +192,81 @@ var changeEffectsPin = function () {
 
 // увеличивает изображение
 var increaseImg = function () {
-  var valueInput = Number(scaleValueInput.value.slice(0, scaleValueInput.value.length - 1));
+  var valueScaleIndicator = Number(scaleIndicator.value.slice(0, scaleIndicator.value.length - 1));
 
-  if (valueInput < MAX_EFFECT_VALUE) {
-    valueInput += SCALE_STEP;
+  if (valueScaleIndicator < MAX_EFFECT_VALUE) {
+    valueScaleIndicator += SCALE_STEP;
   }
 
-  scaleValueInput.value = valueInput + '%';
-  userUploadImg.style.transform = 'scale(' + valueInput / 100 + ')';
+  scaleIndicator.value = valueScaleIndicator + '%';
+  userUploadImg.style.transform = 'scale(' + valueScaleIndicator / 100 + ')';
 };
 
 // уменьшает изображение
 var decreaseImg = function () {
-  var valueInput = Number(scaleValueInput.value.slice(0, scaleValueInput.value.length - 1));
+  var valueScaleIndicator = Number(scaleIndicator.value.slice(0, scaleIndicator.value.length - 1));
 
-  if (valueInput > SCALE_STEP) {
-    valueInput -= SCALE_STEP;
+  if (valueScaleIndicator > SCALE_STEP) {
+    valueScaleIndicator -= SCALE_STEP;
   }
 
-  scaleValueInput.value = valueInput + '%';
-  userUploadImg.style.transform = 'scale(' + valueInput / 100 + ')';
+  scaleIndicator.value = valueScaleIndicator + '%';
+  userUploadImg.style.transform = 'scale(' + valueScaleIndicator / 100 + ')';
 };
 
 // -------------------------------------СОЗДАНИЕ КОММЕНТАРИЯ----------------------------------------------
 
 // генерирует объект-комментарий
-var generateCommentObject = function () {
-  var commentObject = {};
+var generateComment = function () {
+  var comment = {};
 
-  commentObject.avatar = 'img/avatar-' + generateRandomNumber(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
-  commentObject.message = COMMENTS_MESSAGE[generateRandomNumber(0, COMMENTS_MESSAGE.length - 1)];
-  commentObject.name = COMMENT_AUTOR_NAME[generateRandomNumber(0, COMMENT_AUTOR_NAME.length - 1)];
+  comment.avatar = 'img/avatar-' + generateRandomNumber(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
+  comment.message = COMMENTS_MESSAGES[generateRandomNumber(0, COMMENTS_MESSAGES.length - 1)];
+  comment.autor = COMMENT_AUTORS_NAMES[generateRandomNumber(0, COMMENT_AUTORS_NAMES.length - 1)];
 
-  return commentObject;
+  return comment;
 };
 
 // генерирует массив объектов-комментариев
-var generateCommentsObjectsArray = function () {
-  var commentsObjectsArray = [];
-  commentsObjectsArray.length = generateRandomNumber(0, MAX_COMMENTS_COUNT);
+var generateComments = function () {
+  var comments = [];
+  comments.length = generateRandomNumber(0, MAX_COMMENTS_COUNT);
 
-  for (var i = 0; i < commentsObjectsArray.length; i++) {
-    commentsObjectsArray[i] = generateCommentObject();
+  for (var i = 0; i < comments.length; i++) {
+    comments[i] = generateComment();
   }
 
-  return commentsObjectsArray;
+  return comments;
 };
 
+// -------------------------------------СОЗДАНИЕ И ОТРИСОВКА МАЛЕНЬКИХ ФОТО----------------------------------------------
+
 // генерирует объект-фотографию
-var generatePhotoObject = function (photoNumber) {
-  var photoObject = {};
+var generatePhoto = function (photoNumber) {
+  var photo = {};
 
-  photoObject.url = 'photos/' + photoNumber + '.jpg';
-  photoObject.description = PHOTO_DESCRIPTION[generateRandomNumber(0, PHOTO_DESCRIPTION.length - 1)];
-  photoObject.likes = generateRandomNumber(MIN_LIKES_COUNT, MAX_LIKES_COUNT);
-  photoObject.comments = generateCommentsObjectsArray();
+  photo.url = 'photos/' + photoNumber + '.jpg';
+  photo.description = PHOTO_DESCRIPTIONS[generateRandomNumber(0, PHOTO_DESCRIPTIONS.length - 1)];
+  photo.likes = generateRandomNumber(MIN_LIKES_COUNT, MAX_LIKES_COUNT);
+  photo.comments = generateComments();
 
-  return photoObject;
+  return photo;
 };
 
 // генерирует массив объектов-фотографий
-var generatePhotosObjectsArray = function (photosCount) {
-  var photosObjectsArray = [];
+var generatePhotos = function (photosCount) {
+  var photos = [];
 
   for (var i = 0; i < photosCount; i++) {
-    photosObjectsArray[i] = generatePhotoObject(i + 1);
+    photos[i] = generatePhoto(i + 1);
   }
 
-  return photosObjectsArray;
+  return photos;
 };
 
 // отрисовывает фотографию по шаблону
 var renderPhoto = function (photo) {
-  var photoElement = photoTemplate.cloneNode(true);
+  var photoElement = photoSample.cloneNode(true);
 
   photoElement.querySelector('img').src = photo.url;
   photoElement.querySelector('.picture__likes').textContent = photo.likes;
@@ -284,12 +286,12 @@ var renderPhotosList = function (photos) {
   photosList.appendChild(fragment);
 };
 
-renderPhotosList(generatePhotosObjectsArray(PHOTOS_COUNT));
+renderPhotosList(generatePhotos(PHOTOS_COUNT));
 
 // ------------------------ОТРИСОВКА БОЛЬШОЙ КАРТИНКИ--------------------------------
 
 // генерирует шаблон комментария
-var generateCommentTemplate = function (container) {
+var generateCommentSample = function (container) {
   container.insertAdjacentHTML('afterbegin',
       '<li class="social__comment">' +
         '<img class="social__picture" width="35" height="35">' +
@@ -307,15 +309,15 @@ var renderBigPhoto = function (photos) {
   bigPhoto.querySelector('.comments-count').textContent = photos[0].comments.length;
   bigPhoto.querySelector('.social__caption').textContent = photos[0].description;
 
-  commentsDefault.forEach(function (comment) {
-    commentsContainer.removeChild(comment);
+  commentsPlugs.forEach(function (commentPlug) {
+    commentsContainer.removeChild(commentPlug);
   });
 
   for (var i = 0; i < photos[0].comments.length; i++) {
-    generateCommentTemplate(commentsContainer);
+    generateCommentSample(commentsContainer);
 
     commentsContainer.querySelector('.social__comment').querySelector('img').src = photos[0].comments[i].avatar;
-    commentsContainer.querySelector('.social__comment').querySelector('img').alt = photos[0].comments[i].name;
+    commentsContainer.querySelector('.social__comment').querySelector('img').alt = photos[0].comments[i].autor;
     commentsContainer.querySelector('.social__text').textContent = photos[0].comments[i].message;
   }
 };
@@ -423,7 +425,7 @@ var closeBigPhoto = function () {
 // показывает полноразмерное фото при клике на миниатюру
 photosList.addEventListener('click', function (evt) {
   if (evt.target.classList.contains('picture__img')) {
-    renderBigPhoto(generatePhotosObjectsArray(PHOTOS_COUNT));
+    renderBigPhoto(generatePhotos(PHOTOS_COUNT));
   }
 });
 
