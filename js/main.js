@@ -319,8 +319,6 @@ renderPhotosList(generatePhotos(PHOTOS_COUNT));
 // отрисовывает блок с большой фотографией
 var renderBigPhoto = function (photo) {
 
-  console.log(photo);
-
   bigPhoto.classList.remove('hidden');
   bigPhoto.querySelector('.social__comment-count').classList.add('visually-hidden');
   bigPhoto.querySelector('.comments-loader').classList.add('visually-hidden');
