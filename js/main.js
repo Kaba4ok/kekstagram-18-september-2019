@@ -290,6 +290,10 @@ var generatePhotos = function (photosCount) {
 var renderPhoto = function (photo) {
   var photoElement = photoSample.cloneNode(true);
 
+  photoElement.addEventListener('click', function () {
+    renderBigPhoto(photo);
+  });
+
   photoElement.querySelector('img').src = photo.url;
   photoElement.querySelector('.picture__likes').textContent = photo.likes;
   photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
@@ -312,36 +316,23 @@ renderPhotosList(generatePhotos(PHOTOS_COUNT));
 
 // ------------------------ОТРИСОВКА БОЛЬШОЙ КАРТИНКИ--------------------------------
 
-// получает номер фотографии по которй кликнули
-var getNumberPhoto = function (photo) {
-  var photoNumber = Number(photo.src.split('')
-      .filter(function (num) {
-        if (num === '0') {
-          return '0';
-        }
-        return Number(num);
-      })
-      .join(''));
-
-  return photoNumber;
-};
-
 // отрисовывает блок с большой фотографией
-var renderBigPhoto = function (photos, numberPhoto) {
+var renderBigPhoto = function (photo) {
+
+  console.log(photo);
+
   bigPhoto.classList.remove('hidden');
   bigPhoto.querySelector('.social__comment-count').classList.add('visually-hidden');
   bigPhoto.querySelector('.comments-loader').classList.add('visually-hidden');
 
-  var index = numberPhoto - 1;
-
-  bigPhoto.querySelector('.big-picture__img').querySelector('img').src = photos[index].url;
-  bigPhoto.querySelector('.likes-count').textContent = photos[index].likes;
-  bigPhoto.querySelector('.comments-count').textContent = photos[index].comments.length;
-  bigPhoto.querySelector('.social__caption').textContent = photos[index].description;
+  bigPhoto.querySelector('.big-picture__img').querySelector('img').src = photo.url;
+  bigPhoto.querySelector('.likes-count').textContent = photo.likes;
+  bigPhoto.querySelector('.comments-count').textContent = photo.comments.length;
+  bigPhoto.querySelector('.social__caption').textContent = photo.description;
 
   removeComments();
 
-  generateCommentsList(photos[index]);
+  generateCommentsList(photo);
 };
 
 // -----------------------------------ОБРАБОТЧИКИ----------------------------------------
@@ -373,13 +364,6 @@ var onEffectsItemClick = function () {
   resetUserImgSettings();
 
   changeEffectsButton();
-};
-
-//
-var onPhotosListClick = function (evt) {
-  if (evt.target.classList.contains('picture__img')) {
-    renderBigPhoto(generatePhotos(PHOTOS_COUNT), getNumberPhoto(evt.target));
-  }
 };
 
 // обрабатывает изменения значения инпута для хэш-тегов
@@ -447,9 +431,6 @@ hashtagsInput.addEventListener('change', onHashtagsInputChange);
 var closeBigPhoto = function () {
   bigPhoto.classList.add('hidden');
 };
-
-// показывает полноразмерное фото при клике на миниатюру
-photosList.addEventListener('click', onPhotosListClick);
 
 // закрывает полноразмерное фото при клике на кнопку закрытия
 buttonCloseBigPhoto.addEventListener('click', closeBigPhoto);
