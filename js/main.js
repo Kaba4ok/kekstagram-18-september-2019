@@ -35,6 +35,7 @@ var MAX_LIKES_COUNT = 200;
 var PHOTOS_COUNT = 25;
 
 var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 var SCALE_STEP = 25;
 var MAX_EFFECT_VALUE = 100;
@@ -70,6 +71,7 @@ var effectValueInput = uploadField.querySelector('.effect-level__value');
 var effects = uploadField.querySelector('.effects');
 
 var hashtagsInput = uploadField.querySelector('.text__hashtags');
+var commentUploadInput = uploadField.querySelector('.text__description');
 
 // -------------------------------------ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ---------------------------------------------
 
@@ -89,6 +91,8 @@ var resetUserImgSettings = function () {
   scaleIndicator.value = MAX_EFFECT_VALUE + '%';
   effectValueInput.value = MAX_EFFECT_VALUE;
 };
+
+// --------------------------------------------ВАЛИДАЦИЯ-------------------------------------------------------
 
 // определяет наличие повторяющихся хэш-тегов вне зависимости от регистра
 var detectDuplicateHashtag = function (tag, index, hashes) {
@@ -129,6 +133,8 @@ var validateHashtags = function (evt) {
 
   evt.target.setCustomValidity(errorMessage);
 };
+
+// -----------------------------------СМЕНА ЭФФЕКТОВ-----------------------------------------------------
 
 // меняет эффект на фото при нажатии на кнопку эффекта
 var changeEffectsButton = function () {
@@ -180,6 +186,8 @@ var changeEffectsPin = function () {
   }
 };
 
+// ------------------------------УМЕНЬШЕНИЕ/УВЕЛИЧЕНИЕ ЗАГРУЖЕННОГО ФОТО----------------------------------
+
 // увеличивает изображение
 var increaseImg = function () {
   var valueScaleIndicator = Number(scaleIndicator.value.slice(0, scaleIndicator.value.length - 1));
@@ -202,6 +210,34 @@ var decreaseImg = function () {
 
   scaleIndicator.value = valueScaleIndicator + '%';
   userUploadImg.style.transform = 'scale(' + valueScaleIndicator / 100 + ')';
+};
+
+// -------------------------------ОТКРЫТИЕ/ЗАКРЫТИЕ ЗАГРУЖЕННОГО ФОТО----------------------------
+
+// открывает окно редактирования загруженного фото
+var openUploadField = function () {
+  uploadField.querySelector('.img-upload__overlay').classList.remove('hidden');
+
+  document.addEventListener('keydown', onModalEscPress);
+
+  hashtagsInput.addEventListener('focus', onInputFocus);
+  hashtagsInput.addEventListener('blur', onInputBlur);
+
+  commentUploadInput.addEventListener('focus', onInputFocus);
+  commentUploadInput.addEventListener('blur', onInputBlur);
+
+  resetUserImgSettings();
+};
+
+// закрывает окно редактирования загруженного фото
+var closeUploadField = function () {
+  uploadField.querySelector('.img-upload__overlay').classList.add('hidden');
+
+  document.removeEventListener('keydown', onModalEscPress);
+
+  imgUploadInput.value = '';
+
+  resetUserImgSettings();
 };
 
 // -------------------------------------СОЗДАНИЕ КОММЕНТАРИЯ----------------------------------------------
@@ -294,6 +330,12 @@ var renderPhoto = function (photo) {
     renderBigPhoto(photo);
   });
 
+  photoElement.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      renderBigPhoto(photo);
+    }
+  });
+
   photoElement.querySelector('img').src = photo.url;
   photoElement.querySelector('.picture__likes').textContent = photo.likes;
   photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
@@ -331,6 +373,14 @@ var renderBigPhoto = function (photo) {
   removeComments();
 
   generateCommentsList(photo);
+
+  document.addEventListener('keydown', onBigPhotoEscPress);
+};
+
+// закрывает большую фотку
+var closeBigPhoto = function () {
+  bigPhoto.classList.add('hidden');
+  document.removeEventListener('keydown', onBigPhotoEscPress);
 };
 
 // -----------------------------------ОБРАБОТЧИКИ----------------------------------------
@@ -339,6 +389,12 @@ var renderBigPhoto = function (photo) {
 var onModalEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     onButtonCloseUploadFieldPress();
+  }
+};
+
+var onBigPhotoEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeBigPhoto();
   }
 };
 
@@ -370,33 +426,22 @@ var onHashtagsInputChange = function (evt) {
 };
 
 // обработчик события focus на поле ввода хэш-тега
-var onInputHashtagFocus = function () {
+var onInputFocus = function () {
   document.removeEventListener('keydown', onModalEscPress);
+};
+
+var onInputBlur = function () {
+  document.addEventListener('keydown', onModalEscPress);
 };
 
 // открывает окно редактирования
 var onInputUploadChange = function () {
-  uploadField.querySelector('.img-upload__overlay').classList.remove('hidden');
-
-  document.addEventListener('keydown', onModalEscPress);
-
-  hashtagsInput.addEventListener('focus', onInputHashtagFocus);
-  hashtagsInput.addEventListener('blur', function () {
-    document.addEventListener('keydown', onModalEscPress);
-  });
-
-  resetUserImgSettings();
+  openUploadField();
 };
 
 // закрывает окно редактирования
 var onButtonCloseUploadFieldPress = function () {
-  uploadField.querySelector('.img-upload__overlay').classList.add('hidden');
-
-  document.removeEventListener('keydown', onModalEscPress);
-
-  imgUploadInput.value = '';
-
-  resetUserImgSettings();
+  closeUploadField();
 };
 
 // ----------------------------------СОБЫТИЯ------------------------------------------
@@ -406,6 +451,13 @@ imgUploadInput.addEventListener('change', onInputUploadChange);
 
 // закрытие окна редактирования фото при клике на кнопку закрытия
 buttonCloseUploadField.addEventListener('click', onButtonCloseUploadFieldPress);
+
+// закрытие окна редактирования фото при нажатии на кнопку закрытия с клавиатуры
+buttonCloseUploadField.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    onButtonCloseUploadFieldPress();
+  }
+});
 
 // уменьшение изображения при клике на кнопку "-"
 buttonDecreaseImgScale.addEventListener('click', onButtonDecreaseImgClick);
@@ -422,13 +474,12 @@ effects.addEventListener('click', onEffectsItemClick);
 // событие изменения значения инпута для хэш-тегов
 hashtagsInput.addEventListener('change', onHashtagsInputChange);
 
-
-// ---------------ВРЕМЕННО------------------------------------
-
-// закрывает большую фотку
-var closeBigPhoto = function () {
-  bigPhoto.classList.add('hidden');
-};
-
 // закрывает полноразмерное фото при клике на кнопку закрытия
 buttonCloseBigPhoto.addEventListener('click', closeBigPhoto);
+
+// закрывает полноразмерное фото при нажатии на кнопку закрытия с клавиатуры
+buttonCloseBigPhoto.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closeBigPhoto();
+  }
+});
