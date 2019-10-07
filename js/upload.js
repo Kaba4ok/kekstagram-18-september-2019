@@ -17,7 +17,7 @@
   var commentUploadInput = uploadField.querySelector('.text__description');
 
   // сбрасывает все настройки изображения
-  window.resetUserImgSettings = function () {
+  var resetUserImgSettings = function () {
     effectSlider.classList.add('hidden');
     userUploadImg.removeAttribute('class');
     userUploadImg.removeAttribute('style');
@@ -91,5 +91,9 @@
 
   // закрытие окна редактирования фото при нажатии на кнопку закрытия с клавиатуры
   buttonCloseUploadField.addEventListener('keydown', onButtonCloseUploadFieldEnterPress);
+
+  window.upload = {
+    resetUserImgSettings: resetUserImgSettings
+  };
 
 })();

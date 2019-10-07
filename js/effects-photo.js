@@ -74,7 +74,7 @@
 
   // смена эффекта по клику
   var onEffectsItemClick = function () {
-    window.resetUserImgSettings();
+    window.upload.resetUserImgSettings();
 
     changeEffectsButton();
   };
