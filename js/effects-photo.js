@@ -38,7 +38,7 @@
   };
 
   // меняет эффект на фото в зависимости от положения пина
-  var changeEffectsPin = function () {
+  window.changeEffectsPin = function () {
 
     switch (effects.querySelector('input:checked').value) {
       case 'chrome':
@@ -59,28 +59,12 @@
     }
   };
 
-  // вычисление уровня насыщенности эффекта
-  var onPinMouseMove = function () {
-    changeEffectsPin();
-  };
-
-  var onPinMouseUp = function () {
-    document.removeEventListener('mousemove', onPinMouseMove);
-    document.removeEventListener('mouseup', onPinMouseUp);
-  };
-
   // смена эффекта по клику
   var onEffectsItemClick = function () {
     window.utils.resetUserImgSettings();
 
     changeEffectsButton();
   };
-
-  // изменение уровня насыщенности эффекта при
-  document.addEventListener('mousemove', onPinMouseMove);
-
-  //
-  document.addEventListener('mousemup', onPinMouseUp);
 
   // изменение эффекта фото при клике
   effects.addEventListener('click', onEffectsItemClick);
