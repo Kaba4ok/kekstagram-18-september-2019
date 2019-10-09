@@ -66,7 +66,9 @@
     changeEffectsButton();
   };
 
-  // изменение эффекта фото при клике
-  effects.addEventListener('click', onEffectsItemClick);
+  // добавление обработчиков клика на радио-кнопки смены эффекта
+  effects.querySelectorAll('.effects__item').forEach(function (button) {
+    button.addEventListener('click', onEffectsItemClick);
+  });
 
 })();
