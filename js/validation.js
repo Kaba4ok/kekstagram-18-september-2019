@@ -5,8 +5,7 @@
   var HASHTAGS_MAX_COUNT = 5;
   var HASHTAG_MAX_LENGTH = 20;
 
-  var uploadField = document.querySelector('.img-upload');
-  var hashtagsInput = uploadField.querySelector('.text__hashtags');
+  var hashtagsInput = window.utils.uploadField.querySelector('.text__hashtags');
 
   // определяет наличие повторяющихся хэш-тегов вне зависимости от регистра
   var detectDuplicateHashtag = function (tag, index, hashes) {
