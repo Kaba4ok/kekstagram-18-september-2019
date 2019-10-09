@@ -66,6 +66,9 @@
     changeEffectsButton();
   };
 
+
+  // ----------------------------------------ДОБАВЛЕНИЕ ОБРАБОТЧИКОВ НА КНОПКИ СМЕНЫ ЭФФЕКТА----------------------------
+
   // добавление обработчиков клика на радио-кнопки смены эффекта
   effects.querySelectorAll('.effects__item').forEach(function (button) {
     button.addEventListener('click', onEffectsItemClick);

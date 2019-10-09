@@ -51,6 +51,9 @@
     document.addEventListener('mouseup', onMouseUp);
   };
 
+
+  // ----------------------------------------------ПЕРДАЧА СМЕНЫ УРОВНЯ НАСЫЩЕННОСТИ КОЛЛБЭКОМ----------------------
+
   pin.addEventListener('mousedown', function (downEvt) {
     onMouseDown(downEvt, window.changeEffectsPin);
   });
