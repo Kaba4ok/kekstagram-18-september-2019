@@ -4,7 +4,6 @@
 
   var photoSample = document.querySelector('#picture').content.querySelector('.picture');
   var photosList = document.querySelector('.pictures');
-  var error = document.querySelector('#error').content.querySelector('.error');
 
   // обработчик события click по миниатюре фото
   var onPhotoClick = function (photo) {
@@ -53,9 +52,7 @@
   };
 
   var onError = function () {
-    var errorBlock = error.cloneNode(true);
-
-    document.querySelector('main').appendChild(errorBlock);
+    window.openErrorMessage();
   };
 
   window.backend.load(onLoad, onError);

@@ -6,6 +6,7 @@
   var SEPIA_COEFFICIENT = 0.01;
   var PHOBOS_COEFFICIENT = 0.03;
   var HEAT_COEFFICIENT = 0.02;
+  var CORRECTION = 1;
 
   var userUploadImg = window.utils.uploadField.querySelector('.img-upload__preview img');
   var effectSlider = window.utils.uploadField.querySelector('.effect-level');
@@ -54,7 +55,7 @@
         userUploadImg.style.filter = 'blur(' + (effectValueInput.value * PHOBOS_COEFFICIENT) + 'px)';
         break;
       case 'heat':
-        userUploadImg.style.filter = 'brightness(' + (effectValueInput.value * HEAT_COEFFICIENT + 1) + ')';
+        userUploadImg.style.filter = 'brightness(' + (effectValueInput.value * HEAT_COEFFICIENT + CORRECTION) + ')';
         break;
     }
   };
@@ -65,9 +66,6 @@
 
     changeEffectsButton();
   };
-
-
-  // ----------------------------------------ДОБАВЛЕНИЕ ОБРАБОТЧИКОВ НА КНОПКИ СМЕНЫ ЭФФЕКТА----------------------------
 
   // добавление обработчиков клика на радио-кнопки смены эффекта
   effects.querySelectorAll('.effects__item').forEach(function (button) {
