@@ -14,6 +14,10 @@
   var pin = uploadField.querySelector('.effect-level__pin');
   var effectDepth = uploadField.querySelector('.effect-level__depth');
 
+  var imgUploadInput = uploadField.querySelector('.img-upload__input');
+  var hashtagsInput = uploadField.querySelector('.text__hashtags');
+  var commentUploadInput = uploadField.querySelector('.text__description');
+
   // действие при нажатии на ESC
   var isEscPress = function (evt, action) {
     if (evt.keyCode === ESC_KEYCODE) {
@@ -47,11 +51,19 @@
     effectDepth.style.width = MAX_EFFECT_VALUE + '%';
   };
 
+  //
+  var resetForm = function () {
+    imgUploadInput.value = '';
+    hashtagsInput.value = '';
+    commentUploadInput.value = '';
+  };
+
   window.utils = {
     isEscPress: isEscPress,
     isEnterPress: isEnterPress,
     generateRandomNumber: generateRandomNumber,
     resetUserImgSettings: resetUserImgSettings,
+    resetForm: resetForm,
     uploadField: uploadField,
     maxEffectValue: MAX_EFFECT_VALUE
   };
