@@ -18,6 +18,8 @@
   var hashtagsInput = uploadField.querySelector('.text__hashtags');
   var commentUploadInput = uploadField.querySelector('.text__description');
 
+  var effectOriginalInput = uploadField.querySelector('#effect-none');
+
   // действие при нажатии на ESC
   var isEscPress = function (evt, action) {
     if (evt.keyCode === ESC_KEYCODE) {
@@ -56,6 +58,8 @@
     imgUploadInput.value = '';
     hashtagsInput.value = '';
     commentUploadInput.value = '';
+
+    effectOriginalInput.checked = true;
   };
 
   window.utils = {
