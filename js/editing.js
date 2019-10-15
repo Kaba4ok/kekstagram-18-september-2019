@@ -74,6 +74,7 @@
 
   //
   var onError = function () {
+    closeUploadField();
     window.openErrorMessage();
   };
 
