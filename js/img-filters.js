@@ -78,7 +78,7 @@
   var onFilterButtonClick = function (evt) {
     removeActiveClass();
     evt.target.classList.add('img-filters__button--active');
-    filterButtonMap[evt.target.id]();
+    window.debounce(filterButtonMap[evt.target.id]());
   };
 
   // подписка на событие клика по кнопке фильтра
