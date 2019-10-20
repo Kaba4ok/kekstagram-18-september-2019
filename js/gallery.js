@@ -47,6 +47,6 @@
     photosList.appendChild(fragment);
   };
 
-  window.backend.load(renderPhotosList, window.openErrorMessage);
+  window.backend.load(window.renderPhotosList, window.openErrorMessage);
 
 })();
