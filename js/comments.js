@@ -9,9 +9,17 @@
   var bigPhoto = document.querySelector('.big-picture');
   var commentsCount = bigPhoto.querySelector('.social__comment-count');
   var commentsLoader = bigPhoto.querySelector('.comments-loader');
-  var loadedCommentsCount = bigPhoto.querySelector('.loaded-comments-count');
 
   var commentsCopy = [];
+  var count = 0;
+
+  // отрисовывает содержимое блока с актуальным количеством загруженных комментариев
+  var generateCommentsCountBlock = function (loadedComments) {
+    commentsCount.textContent = '';
+    var commentsCountBlockContent = loadedComments + ' из <span class="comments-count">' + count +
+      '</span> комментариев';
+    commentsCount.insertAdjacentHTML('afterbegin', commentsCountBlockContent);
+  };
 
   // генерирует шаблон комментария
   var generateCommentSample = function (comment) {
@@ -28,12 +36,13 @@
       commentsContainer.insertAdjacentHTML('beforeend', htmlComment);
     });
 
-    loadedCommentsCount.textContent = commentsContainer.querySelectorAll('.social__comment').length;
+    generateCommentsCountBlock(commentsContainer.querySelectorAll('.social__comment').length);
   };
 
   // генерирует и отрисовывает список комментариев
   var renderCommentsList = function (photo) {
     commentsCopy = photo.comments.slice();
+    count = photo.comments.length;
 
     if (commentsCopy.length > COMMENTS_LIMIT) {
       commentsCount.classList.remove('visually-hidden');
