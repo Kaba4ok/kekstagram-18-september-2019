@@ -32,17 +32,7 @@
 
   // получает массив случайных и уникальных фото в определенном количестве из родительского массива фото
   var getUniquePhotos = function (photos, count) {
-    var notUniquePhotos = [];
-    var uniquePhotos = [];
-
-    for (var i = 0; uniquePhotos.length < count; i++) {
-      notUniquePhotos[i] = photos[window.utils.generateRandomNumber(0, photos.length - 1)];
-      uniquePhotos = notUniquePhotos.filter(function (it, j) {
-        return notUniquePhotos.indexOf(it) === j;
-      });
-    }
-
-    return uniquePhotos;
+    return window.utils.shufflePhotos(photos.slice()).slice(0, count);
   };
 
   // фильтр "по популярности"
