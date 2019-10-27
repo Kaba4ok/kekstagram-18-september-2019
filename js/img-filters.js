@@ -4,13 +4,9 @@
 
   var RANDOM_IMG_COUNT = 10;
 
-  var imgFilters = document.querySelector('.img-filters');
-  var filterButtons = imgFilters.querySelectorAll('.img-filters__button');
-
+  var filterButtons = document.querySelectorAll('.img-filters__button');
   var photosList = document.querySelector('.pictures');
 
-  // показывает фильтры
-  imgFilters.classList.remove('img-filters--inactive');
 
   // удалаяет класс активной кнопки
   var removeActiveClass = function () {
