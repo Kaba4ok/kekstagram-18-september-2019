@@ -45,7 +45,7 @@
     count = photo.comments.length;
 
     var commentsInRange = commentsCopy.length < COMMENTS_LIMIT;
-    var commentsToRender = commentsInRange ? commentsCopy : commentsCopy.splice(0, 5);
+    var commentsToRender = commentsInRange ? commentsCopy : commentsCopy.splice(0, COMMENTS_LIMIT);
 
     commentsLoader.classList.toggle('visually-hidden', commentsInRange);
 
@@ -54,7 +54,7 @@
 
   // обработчик клика по кнопке загрузки дополнительных комментариев
   var onLoaderClick = function () {
-    renderComments(commentsCopy.splice(0, 5));
+    renderComments(commentsCopy.splice(0, COMMENTS_LIMIT));
 
     if (!commentsCopy.length) {
       commentsLoader.classList.add('visually-hidden');
